@@ -62,4 +62,4 @@ def deleteMP4():
         return make_response(jsonify({'error': 'Unable to remove file'}),422)
     return make_response(jsonify({
         'message': 'File removed.',
-    })) 
+    }))
