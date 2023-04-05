@@ -6,7 +6,6 @@ from time import strftime, gmtime, sleep
 import subprocess
 import secrets
 import threading
-import threading
 import requests
 
 # Route setup
@@ -24,7 +23,7 @@ def converter(data):
     background Process handled by Threads
     :return: None
     """
-    print("Started Task ...")
+    print("Started Task (HLS to MP4)...")
     print(threading.current_thread().name)
     sleep(5)
 
