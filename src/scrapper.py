@@ -31,7 +31,8 @@ def scrapeVideo():
         try:
             r = requests.get("https://www.youtube.com/watch?v="+item, headers=header, proxies=proxies)
             html = repr(named_entities(r.content.decode("utf-8")))
-            pos = html.find("getAdBreakUrl")
+            # pos = html.find("getAdBreakUrl")
+            pos = html.find("yt_ad")
 
             if pos < 0:
                 isMonetizedStatus = "NOT-MONETIZED"
