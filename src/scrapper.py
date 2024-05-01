@@ -4,7 +4,8 @@ from flask import Blueprint, request, jsonify, make_response
 from flask_cors import CORS
 from src.getRandomProxy import getRandomProxy
 import requests
-import json 
+import json
+import time
 
 # Route setup
 scrapper_blueprint = Blueprint('scrapper_blueprint', __name__, url_prefix='/api')
@@ -12,26 +13,27 @@ CORS(scrapper_blueprint, resources=r'/api/*')
 
 @scrapper_blueprint.route('/video/ismonetized', methods=['POST'])
 def scrapeVideo():
-    videoIds = json.loads(request.json['videoIds'])
-
     proxy = getRandomProxy()
     proxies = {
         "http": f"http://{proxy['ip']}:{proxy['port']}",
-        # "https": f"https://{proxy['ip']}:{proxy['port']}",
     }
     header = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9'
     }
 
+    videoIds = json.loads(request.json['videoIds'])
     # videoIds = ["LRP8d7hhpoQ", "trW_lD9sBt0", "2NGjNQVbydc"]
+    # "[\"LRP8d7hhpoQ\",\"trW_lD9sBt0\",\"2NGjNQVbydc\"]"
+
     sortedIds = []
     isMonetizedStatus = ""
 
-    for item in videoIds:
+    for vidId in videoIds:
         try:
-            r = requests.get("https://www.youtube.com/watch?v="+item, headers=header, proxies=proxies)
+            url = "https://www.youtube.com/watch?v="+vidId
+            r = requests.get(url, timeout=20)
             html = repr(named_entities(r.content.decode("utf-8")))
-            # pos = html.find("getAdBreakUrl")
+            # # pos = html.find("getAdBreakUrl")
             pos = html.find("yt_ad")
 
             if pos < 0:
@@ -40,11 +42,13 @@ def scrapeVideo():
                 isMonetizedStatus = "MONETIZED"
 
             sortedIds.append({
-                "vid": item,
+                "vid": vidId,
                 "status": isMonetizedStatus
             })
         except Exception as e:
-            return make_response(jsonify({"error": e}), 422)
+            return make_response(jsonify({"error": str(e)}), 422)
+        
+        time.sleep(15)
 
     return make_response(jsonify({
         "monetizedStatus": sortedIds,
