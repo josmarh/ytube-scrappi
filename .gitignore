@@ -2,3 +2,4 @@ venv/
 static/mp4/*
 static/mp3/*
 **/__pycache__
+*.csv
